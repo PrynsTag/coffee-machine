@@ -1,49 +1,87 @@
-class CoffeeMachine {
-    private var amountWater: Int = 0
-    private var amountMilk: Int = 0
-    private var amountBeans: Int = 0
-    private var cups: Int = 0
+open class CoffeeMachine(
+    open var amountWater: Int = 400, open var amountMilk: Int = 540, open var amountBeans: Int = 120,
+    open var disposableCups: Int = 9, open var amountMoney: Int = 550
+) {
+
+    data class Espresso(
+        override var amountWater: Int = 250, override var amountBeans: Int = 16,
+        override var disposableCups: Int = 1, override var amountMoney: Int = 4
+    ) : CoffeeMachine()
+
+    data class Latte(
+        override var amountWater: Int = 350, override var amountBeans: Int = 20,
+        override var disposableCups: Int = 1, override var amountMoney: Int = 7,
+        override var amountMilk: Int = 75,
+    ) : CoffeeMachine()
+
+    data class Cappuccino(
+        override var amountWater: Int = 200, override var amountBeans: Int = 12,
+        override var disposableCups: Int = 1, override var amountMoney: Int = 6,
+        override var amountMilk: Int = 100,
+    ) : CoffeeMachine()
 
     override fun toString(): String {
         return """
-            For $cups cups of coffee you will need:
-            ${200 * cups} ml of water
-            ${50 * cups} ml of milk
-            ${15 * cups} g of coffee beans
+            The coffee machine has:
+            $amountWater of water
+            $amountMilk of milk
+            $amountBeans of coffee beans
+            $disposableCups of disposable cups
+            $amountMoney of money
         """.trimIndent()
     }
 
-    init {
-        print("Write how many ml of water the coffee machine has: ")
-        amountWater = readLine()!!.toInt()
-
-        print("Write how many ml of milk the coffee machine has: ")
-        amountMilk = readLine()!!.toInt()
-
-        print("Write how many grams of coffee beans the coffee machine has: ")
-        amountBeans = readLine()!!.toInt()
-
-        print("Write how many cups of coffee you will need: ")
-        cups = readLine()!!.toInt()
-    }
-
-    fun checkCoffee() {
-        return when {
-            cups > amountOfCoffee() -> println("No, I can make only ${amountOfCoffee()} cups of coffee")
-            cups == amountOfCoffee() -> println("Yes, I can make that amount of coffee")
-            amountOfCoffee() > cups -> println("Yes, I can make that amount of coffee " +
-                    "(and even ${amountOfCoffee() - cups} more than that)")
-            else -> println("Invalid")
+    fun startMachine() {
+        println(this)
+        print("\nWrite action (buy, fill, take): ")
+        when (readLine()!!) {
+            "buy" -> buyCoffee()
+            "fill" -> fillMachine()
+            "take" -> takeMoney()
         }
     }
 
-    private fun amountOfCoffee() = minOf(amountWater / needWater, amountMilk / needMilk, amountBeans / needCoffeeBeans)
+    private fun buyCoffee() {
+        print("What do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino: ")
+        when (readLine()!!.toInt()) {
+            1 -> reduceResource(Espresso())
+            2 -> reduceResource(Latte())
+            3 -> reduceResource(Cappuccino())
+            else -> println("Wrong Input..")
+        }
+    }
 
-    companion object {
-        const val needWater: Int = 200
-        const val needMilk: Int = 50
-        const val needCoffeeBeans: Int = 15
+    private fun reduceResource(coffee: CoffeeMachine) {
+        println()
+        this.amountWater -= coffee.amountWater
+        if (coffee !is Espresso) this.amountMilk -= coffee.amountMilk
+        this.amountBeans -= coffee.amountBeans
+        this.disposableCups -= coffee.disposableCups
+        this.amountMoney += coffee.amountMoney
+        println(this)
+    }
+
+    private fun fillMachine() {
+        print("Write how many ml of water do you want to add: ")
+        this.amountWater += readLine()!!.toInt()
+
+        print("Write how many ml of milk do you want to add: ")
+        this.amountMilk += readLine()!!.toInt()
+
+        print("Write how many grams of coffee beans do you want to add: ")
+        this.amountBeans += readLine()!!.toInt()
+
+        print("Write how many disposable cups of coffee do you want to add: ")
+        this.disposableCups += readLine()!!.toInt()
+        println()
+        print(this)
+    }
+
+    private fun takeMoney() {
+        println("I gave you $$amountMoney\n")
+        this.amountMoney = 0
+        println(this)
     }
 }
 
-fun main() = CoffeeMachine().checkCoffee()
+fun main() = CoffeeMachine().startMachine()
