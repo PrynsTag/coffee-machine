@@ -6,14 +6,14 @@ open class CoffeeMachine(
     open var amountMoney: Int = 550,
 ) {
 
-    data class Espresso(
+    private data class Espresso(
         override var amountWater: Int = 250,
         override var amountBeans: Int = 16,
         override var disposableCups: Int = 1,
         override var amountMoney: Int = 4,
     ) : CoffeeMachine()
 
-    data class Latte(
+    private data class Latte(
         override var amountWater: Int = 350,
         override var amountBeans: Int = 20,
         override var disposableCups: Int = 1,
@@ -21,7 +21,7 @@ open class CoffeeMachine(
         override var amountMilk: Int = 75,
     ) : CoffeeMachine()
 
-    data class Cappuccino(
+    private data class Cappuccino(
         override var amountWater: Int = 200,
         override var amountBeans: Int = 12,
         override var disposableCups: Int = 1,
