@@ -1,33 +1,21 @@
-open class CoffeeMachine(
-    open var amountWater: Int = 400,
-    open var amountMilk: Int = 540,
-    open var amountBeans: Int = 120,
-    open var disposableCups: Int = 9,
-    open var amountMoney: Int = 550,
+class CoffeeMachine(
+    private var amountWater: Int = 400,
+    private var amountMilk: Int = 540,
+    private var amountBeans: Int = 120,
+    private var disposableCups: Int = 9,
+    private var amountMoney: Int = 550,
 ) {
-
-    private data class Espresso(
-        override var amountWater: Int = 250,
-        override var amountBeans: Int = 16,
-        override var disposableCups: Int = 1,
-        override var amountMoney: Int = 4,
-    ) : CoffeeMachine()
-
-    private data class Latte(
-        override var amountWater: Int = 350,
-        override var amountBeans: Int = 20,
-        override var disposableCups: Int = 1,
-        override var amountMoney: Int = 7,
-        override var amountMilk: Int = 75,
-    ) : CoffeeMachine()
-
-    private data class Cappuccino(
-        override var amountWater: Int = 200,
-        override var amountBeans: Int = 12,
-        override var disposableCups: Int = 1,
-        override var amountMoney: Int = 6,
-        override var amountMilk: Int = 100,
-    ) : CoffeeMachine()
+    enum class Coffee(
+        val water: Int,
+        val milk: Int,
+        val beans: Int,
+        val money: Int,
+        val disposableCups: Int = 1,
+    ) {
+        ESPRESSO(250, 0, 16, 4),
+        LATTE(350, 75, 20, 7),
+        CAPPUCCINO(200, 100, 12, 6);
+    }
 
     override fun toString(): String {
         return "\nThe coffee machine has:\n" +
@@ -54,31 +42,31 @@ open class CoffeeMachine(
     private fun buyCoffee() {
         print("\nWhat do you want to buy? 1 - espresso, 2 - latte, 3 - cappuccino, back - to main menu:")
         when (readLine()!!) {
-            "1" -> reduceResource(Espresso())
-            "2" -> reduceResource(Latte())
-            "3" -> reduceResource(Cappuccino())
+            "1" -> prepareCoffee(Coffee.ESPRESSO)
+            "2" -> prepareCoffee(Coffee.LATTE)
+            "3" -> prepareCoffee(Coffee.CAPPUCCINO)
             "back" -> return
             else -> println("Wrong Input..")
         }
     }
 
-    private fun reduceResource(coffee: CoffeeMachine) {
+    private fun prepareCoffee(coffee: Coffee) {
         when {
-            this.amountWater - coffee.amountWater <= 0 -> return println("Sorry not enough water!\n")
-            this.amountBeans - coffee.amountBeans <= 0 -> return println("Sorry not enough beans!\n")
+            this.amountWater - coffee.water <= 0 -> return println("Sorry not enough water!\n")
+            this.amountBeans - coffee.beans <= 0 -> return println("Sorry not enough beans!\n")
             this.disposableCups - coffee.disposableCups <= 0 -> return println("Sorry not enough cups!\n")
-            coffee !is Espresso -> {
-                if (this.amountMilk - coffee.amountMilk <= 0)
+            coffee != Coffee.ESPRESSO -> {
+                if (this.amountMilk - coffee.milk <= 0)
                     return println("Sorry not enough milk!")
                 else
-                    this.amountMilk -= coffee.amountMilk
+                    this.amountMilk -= coffee.milk
             }
         }
 
-        this.amountWater -= coffee.amountWater
-        this.amountBeans -= coffee.amountBeans
+        this.amountWater -= coffee.water
+        this.amountBeans -= coffee.beans
         this.disposableCups -= coffee.disposableCups
-        this.amountMoney += coffee.amountMoney
+        this.amountMoney += coffee.money
         println("I have enough resources, making you a coffee!\n")
     }
 
@@ -99,8 +87,7 @@ open class CoffeeMachine(
     }
 
     private fun takeMoney() {
-        println()
-        println("I gave you $$amountMoney\n")
+        println("\nI gave you $$amountMoney\n")
         this.amountMoney = 0
     }
 }
